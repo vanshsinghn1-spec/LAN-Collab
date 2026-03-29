@@ -1,0 +1,28 @@
+# LAN Collab Dependencies
+# Pinned versions for reproducibility
+
+# GUI Framework
+PyQt6>=6.6.0,<7.0.0
+
+# Computer Vision and Media
+opencv-python>=4.9.0,<5.0.0
+av>=11.0.0,<12.0.0
+
+# Audio
+pyaudio>=0.2.14
+
+# Screen Capture and Window Management
+mss>=9.0.1,<10.0.0
+pygetwindow>=0.0.9
+
+# Numerical Computing
+numpy>=1.26.0,<2.0.0
+
+# Image Processing
+pillow>=10.2.0,<11.0.0
+
+# SSL/TLS (consider migrating to 'cryptography' library)
+pyopenssl>=24.0.0,<25.0.0
+
+# Future considerations:
+# cryptography>=42.0.0  # For modern SSL certificate handling

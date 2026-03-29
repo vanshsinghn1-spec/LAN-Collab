@@ -1,0 +1,44 @@
+GitHub Publish Steps (LAN Collab)
+
+1) Create a new GitHub repository
+- Name suggestion: LAN-Collab
+- Keep it Public or Private as you prefer.
+
+2) Upload SOURCE (not executables) to the repo
+- Use files from this ZIP:
+  releases/LAN_Collab_Source_GitHub_Ready.zip
+- This ZIP intentionally excludes logs, certs, private keys, cache, and build artifacts.
+
+3) Verify sensitive files are NOT in repo
+- Do not commit server.key
+- Do not commit server.crt
+- Do not commit *.log, __pycache__, build artifacts
+
+4) Add a Release on GitHub for end users
+- Go to: Releases -> Draft a new release
+- Upload this ZIP as release asset:
+  releases/LAN_Collab_Win11_Executables.zip
+- Add release notes:
+  - Start lan_server.exe first
+  - Start lan_client.exe on same LAN
+  - Keep server.crt and server.key in same folder as exe
+
+5) Suggested version tags
+- v1.0.0 for first public stable release
+- v1.0.1, v1.1.0 for later fixes/features
+
+6) Optional: Keep two user paths in README
+- Developers: run from source (fork/clone)
+- End users: download executable ZIP from Releases
+
+Quick command-line option (if using Git locally):
+- git init
+- git add .
+- git commit -m "Initial release"
+- git branch -M main
+- git remote add origin <your-repo-url>
+- git push -u origin main
+
+Note:
+- If server.key/server.crt exist locally, .gitignore should block them.
+- Always check "git status" before commit.
