@@ -103,11 +103,11 @@ STYLESHEET = f"""
         background-color: {BG_COLOR};
     }}
     QFrame#BottomBar {{
-        background-color: {FRAME_BG};
-        border-top: 1px solid {BTN_BG};
+        background-color: {BG_COLOR};
+        border-top: none;
     }}
     QFrame#SidePanel {{
-        background-color: {FRAME_BG};
+        background-color: {BG_COLOR};
         border-left: 1px solid {BTN_BG};
     }}
     
@@ -125,20 +125,20 @@ STYLESHEET = f"""
     }}
     QLabel#AvatarName {{
         font-weight: 500;
-        padding: 4px;
+        padding: 6px 10px;
         color: {FG_COLOR};
-        background-color: rgba(0, 0, 0, 0.4);
+        background-color: rgba(0, 0, 0, 0.6);
         border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
+        border-top-right-radius: 8px;
         margin: 0px;
     }}
     QLabel#VideoFeed {{
         background-color: {LIST_BG};
-        border-radius: 8px; /* Rounded video */
+        border-radius: 12px;
     }}
     QLabel#AvatarCircle {{
         background-color: {LIST_BG};
-        border-radius: 8px; /* Avatars are now rounded tiles */
+        border-radius: 12px;
     }}
     QLabel#PageIndicator {{
         background-color: {BTN_BG};
@@ -219,12 +219,12 @@ STYLESHEET = f"""
         color: {FG_COLOR};
         border: none;
         font-weight: 600;
-        font-size: 11pt;
-        border-radius: 20px; /* Circular */
-        min-width: 40px;
-        max-width: 40px;
-        min-height: 40px;
-        max-height: 40px;
+        font-size: 10pt;
+        border-radius: 24px; /* Circular */
+        min-width: 48px;
+        max-width: 48px;
+        min-height: 48px;
+        max-height: 48px;
     }}
     QPushButton#ControlButton:hover {{
         background-color: {BTN_BG_ACTIVE};
@@ -237,12 +237,12 @@ STYLESHEET = f"""
         color: white;
         border: none;
         font-weight: 600;
-        font-size: 11pt;
-        border-radius: 20px;
-        min-width: 40px;
-        max-width: 40px;
-        min-height: 40px;
-        max-height: 40px;
+        font-size: 10pt;
+        border-radius: 24px;
+        min-width: 48px;
+        max-width: 48px;
+        min-height: 48px;
+        max-height: 48px;
     }}
     QPushButton#ControlButtonRed:hover {{
         background-color: {BTN_DANGER_ACTIVE};
@@ -292,9 +292,8 @@ STYLESHEET = f"""
     
     /* --- Text/List Areas --- */
     QTextEdit, QListWidget {{
-        background-color: {LIST_BG};
-        border: 1px solid {BTN_BG};
-        border-radius: 6px;
+        background-color: {BG_COLOR};
+        border: none;
         color: {FG_COLOR};
         padding: 4px;
     }}
@@ -768,8 +767,8 @@ class ClientGUI(QWidget):
         self.end_call_btn = QPushButton("End")
         self.end_call_btn.setObjectName("ControlButtonRed")
         self.end_call_btn.setToolTip("Leave Meeting")
-        self.end_call_btn.setFixedSize(60, 40)
-        self.end_call_btn.setStyleSheet("border-radius: 20px;")
+        self.end_call_btn.setFixedSize(64, 48)
+        self.end_call_btn.setStyleSheet("border-radius: 24px;")
         self.end_call_btn.clicked.connect(lambda: self.close())
         center_controls_layout.addWidget(self.end_call_btn)
         right_controls_layout = QHBoxLayout()
@@ -1531,16 +1530,16 @@ class ClientGUI(QWidget):
         """
         [Qt Slot]
         Appends a formatted message to the chat QTextEdit.
-        
-        'tag' (e.g., "system", "local_user", "remote_user") is used
-        to apply different CSS styling (color, italics) to the message.
         """
+        if tag == "system":
+            print(f"[SYSTEM LOG]: {message}")
+            return
+            
+        # Parse logic if you wanted distinct stylings for users
         if tag == "local_user":
-            self.chat_area.append(f'<div style="color: {BTN_SUCCESS}; font-weight: 600;">{message}</div>')
+            self.chat_area.append(f'<div style="color: {BTN_SUCCESS}; font-weight: 600; margin-bottom: 5px;">{message}</div>')
         elif tag == "remote_user":
-            self.chat_area.append(f'<div style="color: {ACCENT_COLOR};">{message}</div>')
-        elif tag == "system":
-            self.chat_area.append(f'<div style="color: {FG_DARKER}; font-style: italic;">{message}</div>')
+            self.chat_area.append(f'<div style="background-color: {CHAT_BG}; border-radius: 8px; padding: 8px; margin-bottom: 5px; color: {FG_COLOR};">{message}</div>')
         else:
             self.chat_area.append(message)
         self.chat_area.verticalScrollBar().setValue(self.chat_area.verticalScrollBar().maximum())
@@ -1975,6 +1974,12 @@ class ClientGUI(QWidget):
             self.side_panel.show()
             self.is_side_panel_open = True
             self.main_content_splitter.setSizes([self.width() - 300, 300])
+            QTimer.singleShot(50, self.update_grid_layout)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        # Use a short timer so the geometry is fully updated before recalc
+        QTimer.singleShot(50, self.update_grid_layout)
 
     def toggle_side_panel(self, tab_to_open):
         """
@@ -2001,6 +2006,7 @@ class ClientGUI(QWidget):
             self.side_panel.hide()
             self.is_side_panel_open = False
             self.main_content_splitter.setSizes([self.width(), 0])
+            QTimer.singleShot(50, self.update_grid_layout)
         else:
             try:
                 if tab_to_open == 'chat': self.notebook.setCurrentIndex(0)
@@ -2012,6 +2018,7 @@ class ClientGUI(QWidget):
                 self.side_panel.show()
                 self.is_side_panel_open = True
                 self.main_content_splitter.setSizes([self.width() - 300, 300])
+                QTimer.singleShot(50, self.update_grid_layout)
 
     def generate_avatar(self, username, size):
         """
